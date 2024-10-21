@@ -8,17 +8,8 @@ import {
 } from "../const/viewportSizes";
 import { createAllViewportSnapshotsForBrowser } from "../utils/browserUtils";
 
-export async function viewportsToSnapshots(rootPath: string, url: string) {
+async function initializeLoaders() {
   const yoctoSpinner = await import("yocto-spinner").then((mod) => mod.default);
-  const desktopViewports = Object.values(DESKTOP_VIEWPORT_SIZES);
-  const tabletViewports = Object.values(TABLET_VIEWPORT_SIZES);
-  const mobileViewports = Object.values(MOBILE_VIEWPORT_SIZES);
-
-  // Initialize browsers
-  const chromiumBrowser = await chromium.launch();
-  const firefoxBrowser = await firefox.launch();
-  const webkitBrowser = await webkit.launch();
-
   const chromiumLoader = yoctoSpinner({
     text: "Creating Chromium snapshots",
     color: "blue",
@@ -31,6 +22,22 @@ export async function viewportsToSnapshots(rootPath: string, url: string) {
     text: "Creating Webkit snapshots\n",
     color: "blue",
   });
+
+  return { chromiumLoader, firefoxLoader, webkitLoader };
+}
+
+export async function viewportsToSnapshots(rootPath: string, url: string) {
+  const desktopViewports = Object.values(DESKTOP_VIEWPORT_SIZES);
+  const tabletViewports = Object.values(TABLET_VIEWPORT_SIZES);
+  const mobileViewports = Object.values(MOBILE_VIEWPORT_SIZES);
+
+  // Initialize browsers
+  const chromiumBrowser = await chromium.launch();
+  const firefoxBrowser = await firefox.launch();
+  const webkitBrowser = await webkit.launch();
+
+  const { chromiumLoader, firefoxLoader, webkitLoader } =
+    await initializeLoaders();
 
   console.log("\nGenerating snapshots for all viewports...\n");
   chromiumLoader.start();

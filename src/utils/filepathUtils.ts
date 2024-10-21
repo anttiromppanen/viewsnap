@@ -1,4 +1,5 @@
 import fs from "fs";
+import { BrowserType, ViewportType } from "../types/global";
 
 export async function readAllImagesFromImgFolder(imagesPath: string) {
   // Chromium images
@@ -35,15 +36,21 @@ export async function readAllImagesFromImgFolder(imagesPath: string) {
   );
 
   return {
-    chromiumDesktopFiles,
-    chromiumTabletFiles,
-    chromiumMobileFiles,
-    firefoxDesktopFiles,
-    firefoxTabletFiles,
-    firefoxMobileFiles,
-    webkitDesktopFiles,
-    webkitTabletFiles,
-    webkitMobileFiles,
+    desktop: {
+      chromium: chromiumDesktopFiles,
+      firefox: firefoxDesktopFiles,
+      webkit: webkitDesktopFiles,
+    },
+    tablet: {
+      chromium: chromiumTabletFiles,
+      firefox: firefoxTabletFiles,
+      webkit: webkitTabletFiles,
+    },
+    mobile: {
+      chromium: chromiumMobileFiles,
+      firefox: firefoxMobileFiles,
+      webkit: webkitMobileFiles,
+    },
   };
 }
 
@@ -55,4 +62,28 @@ export function convertImagesToRelativePath(
     .filter((file) => file.endsWith(".png"))
     .map((file) => `${relativePath}/${file}`)
     .sort(); // Filter for PNG files
+}
+
+export function getRelativeImagePathsByBrowserType(
+  images: Record<BrowserType, string[]>,
+  viewport: ViewportType,
+) {
+  const chromiumImages = convertImagesToRelativePath(
+    images.chromium,
+    `img/chromium/${viewport}`,
+  );
+  const firefoxImages = convertImagesToRelativePath(
+    images.firefox,
+    `img/firefox/${viewport}`,
+  );
+  const webkitImages = convertImagesToRelativePath(
+    images.webkit,
+    `img/webkit/${viewport}`,
+  );
+
+  return {
+    chromium: chromiumImages,
+    firefox: firefoxImages,
+    webkit: webkitImages,
+  };
 }

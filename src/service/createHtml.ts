@@ -1,12 +1,13 @@
 import fs from "fs";
 import {
   convertImagesToRelativePath,
+  getRelativeImagePathsByBrowserType,
   readAllImagesFromImgFolder,
 } from "../utils/filepathUtils";
 
-type ImageFilesType = {
-  [key in "chromium" | "firefox" | "webkit"]: string[];
-};
+import "../styles/index.css";
+import { BrowserType, ViewportType } from "../types/global";
+import { extractDimensionsFromPath } from "../utils/stringUtils";
 
 export default async function generateSnapshotsPage(
   imagesPath: string,
@@ -14,7 +15,9 @@ export default async function generateSnapshotsPage(
   title = "Snapshots",
 ) {
   // Function to create HTML structure
-  const generateHTML = (imageFiles: ImageFilesType) => {
+  const generateHTML = (
+    imageFiles: Record<ViewportType, Record<BrowserType, string[]>>,
+  ) => {
     const htmlTemplateStart = `
       <!DOCTYPE html>
       <html lang="en">
@@ -24,15 +27,20 @@ export default async function generateSnapshotsPage(
         <title>${title}</title>
         <style>
           body { font-family: Arial, sans-serif; padding: 0 20px; }
-          img { height: 500px; width: 100%; margin-bottom: 20px; border-radius: 10px; }
-          .container { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; }
+          img { height: 500px; width: 100%; border-radius: 10px; box-shadow: 0 0 12px 0 rgba(0, 0, 0, 0.2); }
+          .container { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 40px; }
           .overlay { position: fixed; top: 0; left: 0; width: 100%; min-height: 100%; background-color: rgba(0, 0, 0, 0.5); z-index: 1; display: flex; justify-content: center; align-items: center; color: white; font-size: 24px; visibility: hidden; }
           .input-container { display: flex; gap: 0 10px; margin-bottom: 20px; }
           .image-wrapper { display: flex; flex-direction: column; }
-          .image-container { position: relative; overflow: hidden; text-align: center; border-radius: 10px; }
-          .image-text { position: absolute; bottom: 24px; left: 0; visibility: hidden; width: calc(100% - 10px); background-color: rgba(0, 0, 0, 0.2); color: white; padding: 10px 5px; border-radius: 0 0 10px 10px; }
+          .image-container { position: relative; text-align: center; border-radius: 10px; margin-bottom: 80px; }
+          .image-text { position: absolute; bottom: 0; left: 0; visibility: hidden; width: calc(100% - 10px); background-color: rgba(0, 0, 0, 0.4); color: white; padding: 10px 5px; border-radius: 0 0 10px 10px; }
           .image-container:hover .image-text { visibility: visible; }
-          .browser-text { padding-left: 10px; }
+          .browser-text { text-align: center; font-size: 1.5rem; margin-bottom: 30px; }
+          .desktop-images { visibility: visible;}
+          .tablet-images { visibility: visible;}
+          .tablet-images img { height: 1066px; }
+          .mobile-images { visibility: visible;}
+          .mobile-images img { width: 400px; }
           h2 { text-align: center; }
         </style>
       </head>
@@ -55,10 +63,10 @@ export default async function generateSnapshotsPage(
       </html>
     `;
 
-    const imageTags = Object.entries(imageFiles)
+    const desktopImagesHtml = Object.entries(imageFiles.desktop)
       .map(([browser, images]) => {
         return `
-          <article class="image-wrapper">
+          <article class="image-wrapper desktop-images">
             <h3 class="browser-text">${browser}</h3>
             <div>
               ${images
@@ -77,43 +85,88 @@ export default async function generateSnapshotsPage(
       })
       .join("\n");
 
+    const tabletImagesHtml = Object.entries(imageFiles.tablet)
+      .map(([browser, images]) => {
+        return `
+          <article class="image-wrapper tablet-images">
+            <h3 class="browser-text">${browser}</h3>
+            <div>
+              ${images
+                .map((file: string) => {
+                  return `
+                    <div class="image-container">
+                      <img src="${file}" alt="${file}" />
+                      <div class="image-text">${file.replace(".png", "")}</div>
+                    </div>
+                  `;
+                })
+                .join("\n")}
+            </div>
+          </article>
+        `;
+      })
+      .join("\n");
+
+    const mobileImagesHtml = Object.entries(imageFiles.mobile)
+      .map(([browser, images]) => {
+        return `
+          <article class="image-wrapper mobile-images">
+            <h3 class="browser-text">${browser}</h3>
+            <div>
+              ${images
+                .map((file: string) => {
+                  const { width, height } = extractDimensionsFromPath(file);
+                  return `
+                    <div class="image-container">
+                      <img src="${file}" alt="${file}" style="width: ${width}px; height: ${height}px;" />
+                      <div class="image-text">${file.replace(".png", "")}</div>
+                    </div>
+                  `;
+                })
+                .join("\n")}
+            </div>
+          </article>
+        `;
+      })
+      .join("\n");
+
     // Return the full HTML content
-    return htmlTemplateStart + imageTags + htmlTemplateEnd;
+    return (
+      htmlTemplateStart +
+      desktopImagesHtml +
+      tabletImagesHtml +
+      mobileImagesHtml +
+      htmlTemplateEnd
+    );
   };
   // Async operation to read the directory and generate the HTML
   try {
     const {
-      chromiumDesktopFiles,
-      chromiumMobileFiles,
-      chromiumTabletFiles,
-      firefoxDesktopFiles,
-      firefoxMobileFiles,
-      firefoxTabletFiles,
-      webkitDesktopFiles,
-      webkitMobileFiles,
-      webkitTabletFiles,
+      desktop: desktopRelativeImagePaths,
+      tablet: tabletRelativeImagePaths,
+      mobile: mobileRelativeImagePaths,
     } = await readAllImagesFromImgFolder(imagesPath);
 
-    const chromiumDesktopImages = convertImagesToRelativePath(
-      chromiumDesktopFiles,
-      "img/chromium/desktop",
+    const desktopImages = getRelativeImagePathsByBrowserType(
+      desktopRelativeImagePaths,
+      "desktop",
     );
-    const firefoxDesktopImages = convertImagesToRelativePath(
-      firefoxDesktopFiles,
-      "img/firefox/desktop",
+    const tabletImages = getRelativeImagePathsByBrowserType(
+      tabletRelativeImagePaths,
+      "tablet",
     );
-    const webkitDesktopImages = convertImagesToRelativePath(
-      webkitDesktopFiles,
-      "img/webkit/desktop",
+    const mobileImages = getRelativeImagePathsByBrowserType(
+      mobileRelativeImagePaths,
+      "mobile",
     );
 
-    const desktopImages = {
-      chromium: chromiumDesktopImages,
-      firefox: firefoxDesktopImages,
-      webkit: webkitDesktopImages,
+    const images = {
+      desktop: desktopImages,
+      tablet: tabletImages,
+      mobile: mobileImages,
     };
 
-    const htmlContent = generateHTML(desktopImages);
+    const htmlContent = generateHTML(images);
 
     await fs.promises.writeFile(outputPath, htmlContent);
     console.log(`HTML file has been generated at: ${outputPath}`);
