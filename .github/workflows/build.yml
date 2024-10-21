@@ -48,4 +48,4 @@ jobs:
       run: npm run start
 
     - name: Verify build
-      run: ls -la ./viewsnap  # or the directory where the build artifacts are generated
+      run: ls -la ./.viewsnap/snapshots.html  # or the directory where the build artifacts are generated
