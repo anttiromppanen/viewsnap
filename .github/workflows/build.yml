@@ -28,6 +28,11 @@ jobs:
     - name: Install dependencies
       run: npm install
 
+    - name: Install Playwright browsers and dependencies
+      uses: microsoft/playwright-github-action@v1
+      with:
+        install-deps: true # This installs the required dependencies for Playwright
+
     - name: Run local frontend
       run: npm run dev &
 
