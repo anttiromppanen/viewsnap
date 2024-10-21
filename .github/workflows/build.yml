@@ -29,7 +29,12 @@ jobs:
       run: npm install
 
     - name: Run local frontend
-      run: npm run dev
+      run: npm run dev &
+
+    - name: Wait for server to be up
+      run: |
+        # Wait for a few seconds to ensure the server is up
+        sleep 5
 
     - name: Run build
       run: npm run build
