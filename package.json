@@ -9,6 +9,7 @@
   "scripts": {
     "build": "tsup src/cli.ts",
     "dev": "http-server ./mock_frontend -p 8080",
+    "start": "node dist/cli.js",
     "test": "test"
   },
   "keywords": [

@@ -38,6 +38,9 @@ jobs:
 
     - name: Run build
       run: npm run build
+    
+    - name: Execute dist/cli.js
+      run: npm run start
 
     - name: Verify build
       run: ls -la ./viewsnap  # or the directory where the build artifacts are generated
