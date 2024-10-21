@@ -33,9 +33,9 @@
     "typescript": "^5.6.3"
   },
   "dependencies": {
-    "find-up": "^7.0.0",
     "playwright-chromium": "^1.48.1",
     "playwright-firefox": "^1.48.1",
-    "playwright-webkit": "^1.48.1"
+    "playwright-webkit": "^1.48.1",
+    "yocto-spinner": "^0.1.1"
   }
 }

@@ -1,4 +1,4 @@
-import { Browser, chromium, firefox, Page, webkit } from "playwright-chromium";
+import { Browser } from "playwright-chromium";
 import { DimensionsType } from "../types/global";
 
 type BrowserType = "chromium" | "firefox" | "webkit";
