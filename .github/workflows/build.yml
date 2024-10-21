@@ -1,0 +1,38 @@
+name: Test Build on Multiple OS
+
+on: 
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Set up Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '18'  # Specify the Node.js version
+
+    - name: Install dependencies
+      run: npm install
+
+    - name: Run local frontend
+      run: npm run dev
+
+    - name: Run build
+      run: npm run build
+
+    - name: Verify build
+      run: ls -la ./viewsnap  # or the directory where the build artifacts are generated

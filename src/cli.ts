@@ -17,7 +17,7 @@ async function generateHtmlPage() {
 async function run() {
   const rootPath = path.resolve(process.cwd()) as string;
   console.time("Time taken to generate snapshots");
-  // await viewportsToSnapshots(rootPath, "http://localhost:5173");
+  await viewportsToSnapshots(rootPath, "http://localhost:8080");
   console.timeEnd("Time taken to generate snapshots");
 
   await generateHtmlPage();

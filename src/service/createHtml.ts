@@ -1,6 +1,5 @@
 import fs from "fs";
 import {
-  convertImagesToRelativePath,
   getRelativeImagePathsByBrowserType,
   readAllImagesFromImgFolder,
 } from "../utils/filepathUtils";
@@ -26,7 +25,7 @@ export default async function generateSnapshotsPage(
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>${title}</title>
         <style>
-          body { font-family: Arial, sans-serif; padding: 0 20px; }
+          body { font-family: Arial, sans-serif; padding: 0 30px; }
           img { height: 500px; width: 100%; border-radius: 10px; box-shadow: 0 0 12px 0 rgba(0, 0, 0, 0.2); }
           .container { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 40px; }
           .overlay { position: fixed; top: 0; left: 0; width: 100%; min-height: 100%; background-color: rgba(0, 0, 0, 0.5); z-index: 1; display: flex; justify-content: center; align-items: center; color: white; font-size: 24px; visibility: hidden; }

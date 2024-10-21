@@ -11,8 +11,8 @@ export async function createSnapshotForBrowser(
   browser: Browser,
   browserType: BrowserType,
 ) {
-  // 5 * 60 * 1000 milliseconds = 5 minutes
-  const timeout = 5 * 60 * 1000;
+  // 2 * 60 * 1000 milliseconds = 2 minutes
+  const timeout = 2 * 60 * 1000;
   const page = await browser.newPage();
   await page.setViewportSize(viewportSize);
 
@@ -22,6 +22,7 @@ export async function createSnapshotForBrowser(
   await page.screenshot({
     path: `${rootPath}/.viewsnap/img/${browserType}/${category}/${browserType}-${width}-${height}.png`,
     timeout: timeout,
+    animations: "disabled",
   });
 }
 
@@ -34,36 +35,46 @@ export async function createAllViewportSnapshotsForBrowser(
   browser: Browser,
   browserType: BrowserType,
 ) {
+  const promises = [];
+
   for (const viewport of desktopViewports) {
-    await createSnapshotForBrowser(
-      rootPath,
-      url,
-      viewport,
-      "desktop",
-      browser,
-      browserType,
+    promises.push(
+      createSnapshotForBrowser(
+        rootPath,
+        url,
+        viewport,
+        "desktop",
+        browser,
+        browserType,
+      ),
     );
   }
 
   for (const viewport of tabletViewports) {
-    await createSnapshotForBrowser(
-      rootPath,
-      url,
-      viewport,
-      "tablet",
-      browser,
-      browserType,
+    promises.push(
+      createSnapshotForBrowser(
+        rootPath,
+        url,
+        viewport,
+        "tablet",
+        browser,
+        browserType,
+      ),
     );
   }
 
   for (const viewport of mobileViewports) {
-    await createSnapshotForBrowser(
-      rootPath,
-      url,
-      viewport,
-      "mobile",
-      browser,
-      browserType,
+    promises.push(
+      createSnapshotForBrowser(
+        rootPath,
+        url,
+        viewport,
+        "mobile",
+        browser,
+        browserType,
+      ),
     );
   }
+
+  await Promise.all(promises);
 }
