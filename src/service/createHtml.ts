@@ -1,13 +1,21 @@
 import fs from "fs";
 import path from "path";
+import {
+  convertImagesToRelativePath,
+  readAllImagesFromImgFolder,
+} from "../utils/filepathUtils";
+
+type ImageFilesType = {
+  [key in "chromium" | "firefox" | "webkit"]: string[];
+};
 
 export default async function generateSnapshotsPage(
-  imagesPath,
-  outputPath,
-  title = "Snapshots"
+  imagesPath: string,
+  outputPath: string,
+  title = "Snapshots",
 ) {
   // Function to create HTML structure
-  const generateHTML = (imageFiles) => {
+  const generateHTML = (imageFiles: ImageFilesType) => {
     const htmlTemplateStart = `
       <!DOCTYPE html>
       <html lang="en">
@@ -55,11 +63,10 @@ export default async function generateSnapshotsPage(
             <h3 class="browser-text">${browser}</h3>
             <div>
               ${images
-                .map((file) => {
-                  const relativeImagePath = path.join(imagesPath, file);
+                .map((file: string) => {
                   return `
                     <div class="image-container">
-                      <img src="${relativeImagePath}" alt="${file}" />
+                      <img src="${file}" alt="${file}" />
                       <div class="image-text">${file.replace(".png", "")}</div>
                     </div>
                   `;
@@ -74,56 +81,32 @@ export default async function generateSnapshotsPage(
     // Return the full HTML content
     return htmlTemplateStart + imageTags + htmlTemplateEnd;
   };
-
   // Async operation to read the directory and generate the HTML
   try {
-    // Chromium images
-    const chromiumDesktopFiles = await fs.promises.readdir(
-      `${imagesPath}/chromium/desktop`
-    );
-    const chromiumTabletFiles = await fs.promises.readdir(
-      `${imagesPath}/chromium/tablet`
-    );
-    const chromiumMobileFiles = await fs.promises.readdir(
-      `${imagesPath}/chromium/mobile`
-    );
+    const {
+      chromiumDesktopFiles,
+      chromiumMobileFiles,
+      chromiumTabletFiles,
+      firefoxDesktopFiles,
+      firefoxMobileFiles,
+      firefoxTabletFiles,
+      webkitDesktopFiles,
+      webkitMobileFiles,
+      webkitTabletFiles,
+    } = await readAllImagesFromImgFolder(imagesPath);
 
-    // Firefox images
-    const firefoxDesktopFiles = await fs.promises.readdir(
-      `${imagesPath}/firefox/desktop`
+    const chromiumDesktopImages = convertImagesToRelativePath(
+      chromiumDesktopFiles,
+      "img/chromium/desktop",
     );
-    const firefoxTabletFiles = await fs.promises.readdir(
-      `${imagesPath}/firefox/tablet`
+    const firefoxDesktopImages = convertImagesToRelativePath(
+      firefoxDesktopFiles,
+      "img/firefox/desktop",
     );
-    const firefoxMobileFiles = await fs.promises.readdir(
-      `${imagesPath}/firefox/mobile`
+    const webkitDesktopImages = convertImagesToRelativePath(
+      webkitDesktopFiles,
+      "img/webkit/desktop",
     );
-
-    // Webkit images
-    const webkitDesktopFiles = await fs.promises.readdir(
-      `${imagesPath}/webkit/desktop`
-    );
-    const webkitTabletFiles = await fs.promises.readdir(
-      `${imagesPath}/webkit/tablet`
-    );
-    const webkitMobileFiles = await fs.promises.readdir(
-      `${imagesPath}/webkit/mobile`
-    );
-
-    const chromiumDesktopImages = chromiumDesktopFiles
-      .filter((file) => file.endsWith(".png"))
-      .map((file) => `chromium/desktop/${file}`)
-      .sort(); // Filter for PNG files
-
-    const firefoxDesktopImages = firefoxDesktopFiles
-      .filter((file) => file.endsWith(".png"))
-      .map((file) => `firefox/desktop/${file}`)
-      .sort(); // Filter for PNG files
-
-    const webkitDesktopImages = webkitDesktopFiles
-      .filter((file) => file.endsWith(".png"))
-      .map((file) => `webkit/desktop/${file}`)
-      .sort(); // Filter for PNG files
 
     const desktopImages = {
       chromium: chromiumDesktopImages,

@@ -1,8 +1,11 @@
-import { chromium } from "playwright-chromium";
+import { Browser, BrowserType, chromium } from "playwright-chromium";
 import { firefox } from "playwright-firefox";
 import { webkit } from "playwright-webkit";
 import { DimensionsType } from "../types/global";
-import createSnapshotForBrowser from "../utils/createSnapshotForBrowser";
+import {
+  createAllViewportSnapshotsForBrowser,
+  createSnapshotForBrowser,
+} from "../utils/browserUtils";
 import {
   DESKTOP_VIEWPORT_SIZES,
   MOBILE_VIEWPORT_SIZES,
@@ -10,58 +13,48 @@ import {
 } from "../const/viewportSizes";
 
 export async function viewportsToSnapshots(rootPath: string, url: string) {
-  const chromiumBrowser = await chromium.launch();
-  const firefoxBrowser = await firefox.launch();
-  const webkitBrowser = await webkit.launch();
-
   const desktopViewports = Object.values(DESKTOP_VIEWPORT_SIZES);
   const tabletViewports = Object.values(TABLET_VIEWPORT_SIZES);
   const mobileViewports = Object.values(MOBILE_VIEWPORT_SIZES);
 
-  const snapshotPromises: Promise<void>[] = [];
+  // Initialize browsers
+  const chromiumBrowser = await chromium.launch();
+  const firefoxBrowser = await firefox.launch();
+  const webkitBrowser = await webkit.launch();
 
-  const addSnapshotPromises = (
-    viewports: DimensionsType[],
-    deviceType: "desktop" | "tablet" | "mobile"
-  ) => {
-    viewports.forEach((item) => {
-      snapshotPromises.push(
-        createSnapshotForBrowser(
-          rootPath,
-          url,
-          item,
-          deviceType,
-          chromiumBrowser,
-          "chromium"
-        ),
-        createSnapshotForBrowser(
-          rootPath,
-          url,
-          item,
-          deviceType,
-          firefoxBrowser,
-          "firefox"
-        ),
-        createSnapshotForBrowser(
-          rootPath,
-          url,
-          item,
-          deviceType,
-          webkitBrowser,
-          "webkit"
-        )
-      );
-    });
-  };
+  await createAllViewportSnapshotsForBrowser(
+    desktopViewports,
+    tabletViewports,
+    mobileViewports,
+    rootPath,
+    url,
+    chromiumBrowser,
+    "chromium",
+  );
 
-  // Add promises for desktop, tablet, and mobile
-  addSnapshotPromises(desktopViewports, "desktop");
-  addSnapshotPromises(tabletViewports, "tablet");
-  addSnapshotPromises(mobileViewports, "mobile");
+  chromiumBrowser.close();
 
-  // Run all snapshot promises concurrently
-  await Promise.all(snapshotPromises);
-  await chromiumBrowser.close();
-  await firefoxBrowser.close();
-  await webkitBrowser.close();
+  await createAllViewportSnapshotsForBrowser(
+    desktopViewports,
+    tabletViewports,
+    mobileViewports,
+    rootPath,
+    url,
+    firefoxBrowser,
+    "firefox",
+  );
+
+  firefoxBrowser.close();
+
+  await createAllViewportSnapshotsForBrowser(
+    desktopViewports,
+    tabletViewports,
+    mobileViewports,
+    rootPath,
+    url,
+    webkitBrowser,
+    "webkit",
+  );
+
+  webkitBrowser.close();
 }
