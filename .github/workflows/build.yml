@@ -33,14 +33,15 @@ jobs:
       with:
         install-deps: true # This installs the required dependencies for Playwright
 
-    - name: Start local frontend server
+    - name: Start local frontend server (Windows)
+      if: runner.os == 'Windows'
+      run: Start-Process -NoNewWindow -FilePath "npm" -ArgumentList "run", "dev"
+      shell: pwsh  # Using PowerShell on Windows
+
+    - name: Start local frontend server (Linux/Mac)
+      if: runner.os != 'Windows'
+      run: npm run dev &
       shell: bash
-      run: |
-        if [ "$RUNNER_OS" == "Windows" ]; then
-          start /b npm run dev  # Windows command to run server in background
-        else
-          npm run dev &  # Use background process in Unix-based systems
-        fi
 
     - name: Wait for server to be ready
       run: sleep 15
