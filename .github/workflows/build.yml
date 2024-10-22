@@ -26,7 +26,7 @@ jobs:
         node-version: '18'  # Specify the Node.js version
 
     - name: Install dependencies
-      run: npm install
+      run: npm ci
 
     - name: Install Playwright browsers and dependencies
       uses: microsoft/playwright-github-action@v1
@@ -37,7 +37,7 @@ jobs:
       run: npm run dev &
 
     - name: Wait for server to be ready
-      run: npx wait-on http://localhost:8080
+      run: sleep 15
 
     - name: Run build
       run: npm run build
