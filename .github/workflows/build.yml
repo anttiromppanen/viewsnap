@@ -33,11 +33,11 @@ jobs:
       with:
         install-deps: true # This installs the required dependencies for Playwright
 
-    - name: Run local frontend
+    - name: Start local frontend server
       run: npm run dev &
 
     - name: Wait for server to be ready
-      run: npx wait-on npm run dev &
+      run: npx wait-on http://localhost:8080
 
     - name: Run build
       run: npm run build
