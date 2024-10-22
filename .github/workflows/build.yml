@@ -37,7 +37,7 @@ jobs:
       run: npm run dev &
 
     - name: Wait for server to be ready
-      run: npx wait-on http://localhost:8080
+      run: npx wait-on npm run dev &
 
     - name: Run build
       run: npm run build
