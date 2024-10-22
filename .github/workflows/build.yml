@@ -37,12 +37,7 @@ jobs:
       run: npm run dev &
 
     - name: Wait for server to be ready
-      run: |
-        for i in {1..10}; do
-          curl http://localhost:8080 && break
-          echo "Waiting for server..."
-          sleep 5
-        done
+      run: npx wait-on http://localhost:8080
 
     - name: Run build
       run: npm run build
