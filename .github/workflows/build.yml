@@ -36,10 +36,13 @@ jobs:
     - name: Run local frontend
       run: npm run dev &
 
-    - name: Wait for server to be up
+    - name: Wait for server to be ready
       run: |
-        # Wait for a few seconds to ensure the server is up
-        sleep 5
+        for i in {1..10}; do
+          curl http://localhost:8080 && break
+          echo "Waiting for server..."
+          sleep 5
+        done
 
     - name: Run build
       run: npm run build
