@@ -33,6 +33,10 @@ jobs:
       with:
         install-deps: true # This installs the required dependencies for Playwright
 
+    - name: Disable Windows Firewall
+      run: netsh advfirewall set allprofiles state off
+      if: runner.os == 'Windows'
+
     - name: Start local frontend server (Windows)
       if: runner.os == 'Windows'
       run: Start-Process -NoNewWindow -FilePath "npm" -ArgumentList "run", "dev"
