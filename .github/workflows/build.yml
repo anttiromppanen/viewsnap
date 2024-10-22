@@ -37,11 +37,6 @@ jobs:
       run: netsh advfirewall set allprofiles state off
       if: runner.os == 'Windows'
 
-    - name: Check port usage (Windows)
-      if: runner.os == 'Windows'
-      run: netstat -aon | findstr :8080
-      shell: cmd
-
     - name: Start local frontend server (Windows)
       if: runner.os == 'Windows'
       run: Start-Process -NoNewWindow -FilePath "npm" -ArgumentList "run", "dev" -RedirectStandardOutput "./server.log"
@@ -59,6 +54,12 @@ jobs:
 
     - name: Wait for server to be ready
       run: sleep 30
+
+    - name: Check port usage (Windows)
+      if: runner.os == 'Windows'
+      run: |
+        netstat -aon | findstr ":8080" || echo "Port 8080 is not in use"
+      shell: cmd
 
     - name: Run build
       run: npm run build
