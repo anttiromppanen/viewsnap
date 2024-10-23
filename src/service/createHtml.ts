@@ -176,7 +176,7 @@ export default async function generateHtmlFromImagePaths(
                     <div class="image-container">
                       <div class="image-container-two" style="position: relative;">
                         <button type="button" class="image-button" onClick="handleImageButtonClick(event)" value=${file}></button>
-                        <img src="${file}" alt="${file}" style="height: ${fullHeight ? "100%" : `${height}px`};" />
+                        <img src="${file}" alt="${file}" style="${fullHeight && `height: ${height}`}" />
                         <div class="image-text">${file.replace(".png", "")}</div>
                       </div>
                     </div>
