@@ -4,13 +4,12 @@ import {
   readAllImagesFromImgFolder,
 } from "../utils/filepathUtils";
 
-import "../styles/index.css";
 import { BrowserType, ViewportType } from "../types/global";
 import { extractDimensionsFromPath } from "../utils/stringUtils";
 
-export default async function generateSnapshotsPage(
+export default async function generateHtmlFromImagePaths(
   imagesPath: string,
-  outputPath: string,
+  outputHtmlFilepath: string,
   title = "Snapshots",
 ) {
   // Function to create HTML structure
@@ -23,31 +22,51 @@ export default async function generateSnapshotsPage(
       <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&family=Outfit:wght@100..900&display=swap" rel="stylesheet">
         <title>${title}</title>
         <style>
-          body { font-family: Arial, sans-serif; padding: 0 30px; }
-          img { height: 500px; width: 100%; border-radius: 10px; box-shadow: 0 0 12px 0 rgba(0, 0, 0, 0.2); }
+          body { font-family: "Montserrat", sans-serif; padding: 0 30px; background-color: #fdfdfd; color: #243642; }
+          img { border-radius: 10px; box-shadow: 0 0 12px 0 rgba(0, 0, 0, 0.2); }
+          h1 { font-size: 2.5rem; }
           .container { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 40px; }
-          .overlay { position: fixed; top: 0; left: 0; width: 100%; min-height: 100%; background-color: rgba(0, 0, 0, 0.5); z-index: 1; display: flex; justify-content: center; align-items: center; color: white; font-size: 24px; visibility: hidden; }
-          .input-container { display: flex; gap: 0 10px; margin-bottom: 20px; }
+          .container img { height: 500px; width: 100%; }
+          #overlay { position: fixed; top: 0; left: 0; width: 100%; min-height: 100%; background-color: rgba(0, 0, 0, 0.5); z-index: 9999; display: none; justify-content: center; align-items: center; color: white; font-size: 24px; }
+          #overlay-container { display: flex; flex-direction: column; justify-content: center; align-items: center; }
+          #overlay-container button { padding: 5px 10px; border-radius: 5px; font-size: 1.2rem; border: none; background-color: white; cursor: pointer; }
+          #overlay img { max-width: 90%; max-height: 90%; }
+          #device-group-select { padding: 10px; font-size: 1.2rem; border-radius: 5px; border: 1px solid #243642; }
+          .input-container { display: flex; gap: 0 10px; margin-bottom: 20px; justify-content: center; }
           .image-wrapper { display: flex; flex-direction: column; }
           .image-container { position: relative; text-align: center; border-radius: 10px; margin-bottom: 80px; }
           .image-text { position: absolute; bottom: 0; left: 0; visibility: hidden; width: calc(100% - 10px); background-color: rgba(0, 0, 0, 0.4); color: white; padding: 10px 5px; border-radius: 0 0 10px 10px; }
           .image-container:hover .image-text { visibility: visible; }
-          .browser-text { text-align: center; font-size: 1.5rem; margin-bottom: 30px; }
-          .desktop-images { visibility: visible;}
-          .tablet-images { visibility: visible;}
+          .browser-text { text-align: center; font-size: 1.2rem; margin-bottom: 30px; color: #387478; }
+          .desktop-images { display: block; }
+          .tablet-images { display: block;}
           .tablet-images img { height: 1066px; }
-          .mobile-images { visibility: visible;}
+          .mobile-images { display: block;}
           .mobile-images img { width: 400px; }
-          h2 { text-align: center; }
+          .image-button { position: absolute; left: 0; top: 0; width: 100%; height: 100%; cursor: pointer; border: none; z-index: 2; background-color: transparent; }
+          h1, h2 { text-align: center; }
         </style>
       </head>
       <body>
-        <div class="overlay">test</div>
-        <h2>${title}</h2>
+        <div id="overlay">
+          <div id="overlay-container">
+            <div style="width: 100%; display: flex; justify-content: flex-end; max-width: 90%">
+              <button type="button" onClick="document.getElementById('overlay').style.display = 'none'">X</button>
+            </div>
+            <h2></h2>
+            <img src="" alt="" /> 
+          </div>
+        </div>
+        <h1>${title}</h1>
+        <h2 id="active-viewports-heading">All Viewports</h2>
         <div class="input-container">
           <select id="device-group-select">
+            <option value="all">All</option>
             <option value="desktop">Desktop</option>
             <option value="tablet">Tablet</option>
             <option value="mobile">Mobile</option>
@@ -58,11 +77,66 @@ export default async function generateSnapshotsPage(
 
     const htmlTemplateEnd = `
         </div>
+        <script>
+          function handleImageButtonClick(e) {
+            const overlay = document.getElementById("overlay");
+            const imageSrc = e.target.value;
+            
+            overlay.style.display = "flex";
+            overlay.querySelector("img").src = imageSrc;
+            overlay.querySelector("h2").innerText = imageSrc;
+          }
+
+          document.addEventListener("DOMContentLoaded", () => {
+            const deviceGroupSelect = document.getElementById("device-group-select");
+            const activeViewportsHeading = document.getElementById("active-viewports-heading");
+
+            let desktopImages = document.getElementsByClassName("desktop-images");
+            let tabletImages = document.getElementsByClassName("tablet-images");
+            let mobileImages = document.getElementsByClassName("mobile-images");
+            
+            function toggleViewportImages() {
+              const selectedViewport = deviceGroupSelect.value;
+              
+              switch (selectedViewport) {
+                case "desktop":
+                  Array.from(desktopImages).forEach((image) => image.style.display = "block");
+                  Array.from(tabletImages).forEach((image) => image.style.display = "none");
+                  Array.from(mobileImages).forEach((image) => image.style.display = "none");
+                  activeViewportsHeading.innerText = "Desktop";
+                  break;
+                case "tablet":
+                  Array.from(desktopImages).forEach((image) => image.style.display = "none");
+                  Array.from(tabletImages).forEach((image) => image.style.display = "block");
+                  Array.from(mobileImages).forEach((image) => image.style.display = "none");
+                  activeViewportsHeading.innerText = "Tablet";
+                  break;
+                case "mobile":
+                  Array.from(desktopImages).forEach((image) => image.style.display = "none");
+                  Array.from(tabletImages).forEach((image) => image.style.display = "none");
+                  Array.from(mobileImages).forEach((image) => image.style.display = "block");
+                  activeViewportsHeading.innerText = "Mobile";
+                  break;
+                default:
+                  Array.from(desktopImages).forEach((image) => image.style.display = "block");
+                  Array.from(tabletImages).forEach((image) => image.style.display = "block");
+                  Array.from(mobileImages).forEach((image) => image.style.display = "block");
+                  activeViewportsHeading.innerText = "All Viewports";
+                  break;
+              }
+            }
+
+            deviceGroupSelect.addEventListener("change", toggleViewportImages);
+            toggleViewportImages();
+          });
+        </script>
       </body>
       </html>
     `;
 
-    const desktopImagesHtml = Object.entries(imageFiles.desktop)
+    // Desktop images HTML
+    const desktopImagesHtml = `
+    ${Object.entries(imageFiles.desktop)
       .map(([browser, images]) => {
         return `
           <article class="image-wrapper desktop-images">
@@ -72,7 +146,10 @@ export default async function generateSnapshotsPage(
                 .map((file: string) => {
                   return `
                     <div class="image-container">
-                      <img src="${file}" alt="${file}" />
+                      <div style="position: relative;">
+                        <button type="button" class="image-button" onClick="handleImageButtonClick(event)" value=${file}></button>
+                        <img src="${file}" alt="${file}" />
+                      </div>
                       <div class="image-text">${file.replace(".png", "")}</div>
                     </div>
                   `;
@@ -82,8 +159,9 @@ export default async function generateSnapshotsPage(
           </article>
         `;
       })
-      .join("\n");
+      .join("\n")}`;
 
+    // Tablet images HTML
     const tabletImagesHtml = Object.entries(imageFiles.tablet)
       .map(([browser, images]) => {
         return `
@@ -106,6 +184,7 @@ export default async function generateSnapshotsPage(
       })
       .join("\n");
 
+    // Mobile images HTML
     const mobileImagesHtml = Object.entries(imageFiles.mobile)
       .map(([browser, images]) => {
         return `
@@ -167,8 +246,8 @@ export default async function generateSnapshotsPage(
 
     const htmlContent = generateHTML(images);
 
-    await fs.promises.writeFile(outputPath, htmlContent);
-    console.log(`HTML file has been generated at: ${outputPath}`);
+    await fs.promises.writeFile(outputHtmlFilepath, htmlContent);
+    console.log(`HTML file has been generated at: ${outputHtmlFilepath}`);
   } catch (err) {
     console.error("Error generating snapshots page:", err);
   }

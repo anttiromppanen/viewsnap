@@ -1,17 +1,17 @@
 #!/bin/env node
 import path from "path";
-import generateSnapshotsPage from "./service/createHtml";
 import { viewportsToSnapshots } from "./service/viewportsToSnapshots";
+import generateHtmlFromImagePaths from "./service/createHtml";
 
 async function generateHtmlPage() {
   const pageTitle = "Viewport Snapshots";
 
   const rootPath = path.resolve(process.cwd());
   const imagesPath = path.resolve(rootPath, ".viewsnap/img/");
-  const outputFile = path.join(`${rootPath}/.viewsnap`, "snapshots.html");
+  const outputHtmlPath = path.join(`${rootPath}/.viewsnap`, "snapshots.html");
 
   // Call the function to generate the HTML page
-  generateSnapshotsPage(imagesPath, outputFile, pageTitle);
+  generateHtmlFromImagePaths(imagesPath, outputHtmlPath, pageTitle);
 }
 
 async function run() {
