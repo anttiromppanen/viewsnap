@@ -1,15 +1,18 @@
 {
   "name": "viewsnap",
   "version": "1.0.0",
-  "description": "Creates a collection of snapshots of a web project for different viewport dimensions",
+  "description": "Creates a collection of snapshots of a web project for various viewport dimensions",
   "main": "cli.js",
   "bin": {
     "viewsnap": "dist/cli.js"
   },
+  "files": [
+    "dist"
+  ],
   "scripts": {
     "build": "tsup src/cli.ts",
     "dev": "http-server ./mock_frontend -p 8080",
-    "start": "node dist/cli.js",
+    "start": "node dist/cli.js generate",
     "test": "test"
   },
   "keywords": [
@@ -37,6 +40,7 @@
     "wait-on": "^8.0.1"
   },
   "dependencies": {
+    "commander": "^12.1.0",
     "playwright-chromium": "^1.48.1",
     "playwright-firefox": "^1.48.1",
     "playwright-webkit": "^1.48.1",

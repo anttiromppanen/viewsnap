@@ -11,6 +11,7 @@ export default async function generateHtmlFromImagePaths(
   imagesPath: string,
   outputHtmlFilepath: string,
   title = "Snapshots",
+  fullHeight = false,
 ) {
   // Function to create HTML structure
   const generateHTML = (
@@ -32,22 +33,24 @@ export default async function generateHtmlFromImagePaths(
           h1 { font-size: 2.5rem; }
           .container { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 40px; }
           .container img { height: 500px; width: 100%; }
-          #overlay { position: fixed; top: 0; left: 0; width: 100%; min-height: 100%; background-color: rgba(0, 0, 0, 0.5); z-index: 9999; display: none; justify-content: center; align-items: center; color: white; font-size: 24px; }
-          #overlay-container { display: flex; flex-direction: column; justify-content: center; align-items: center; }
-          #overlay-container button { padding: 5px 10px; border-radius: 5px; font-size: 1.2rem; border: none; background-color: white; cursor: pointer; }
+          #overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100vh; max-height: 100vh; background-color: rgba(0, 0, 0, 0.8); z-index: 9999; display: none; justify-content: center; align-items: center; color: white; font-size: 24px; }
+          #overlay-container { display: flex; flex-direction: column; justify-content: center; align-items: center; height: 100%; }
+          #overlay-container button { padding: 5px 10px; border-radius: 5px; font-size: 1.2rem; border: none; background-color: white; cursor: pointer; position: absolute; top: 40px; right: 40px; }
+          #overlay-container h2 { position: absolute; top: 15px; left: 20px; font-size: 1.3rem; }
           #overlay img { max-width: 90%; max-height: 90%; }
           #device-group-select { padding: 10px; font-size: 1.2rem; border-radius: 5px; border: 1px solid #243642; }
           .input-container { display: flex; gap: 0 10px; margin-bottom: 20px; justify-content: center; }
           .image-wrapper { display: flex; flex-direction: column; }
           .image-container { position: relative; text-align: center; border-radius: 10px; margin-bottom: 80px; }
-          .image-text { position: absolute; bottom: 0; left: 0; visibility: hidden; width: calc(100% - 10px); background-color: rgba(0, 0, 0, 0.4); color: white; padding: 10px 5px; border-radius: 0 0 10px 10px; }
-          .image-container:hover .image-text { visibility: visible; }
+          .image-text { background-color: red; height: calc(100% - 3px); position: absolute; left: 0; bottom: 3px; width: 100%; color: white; display: flex; justify-content: center; align-items: center; border-radius: 10px; visibility: hidden; background-color: rgba(0, 0, 0, 0.7); }
+          .image-container-two:hover .image-text { visibility: visible; }
           .browser-text { text-align: center; font-size: 1.2rem; margin-bottom: 30px; color: #387478; }
           .desktop-images { display: block; }
           .tablet-images { display: block;}
           .tablet-images img { height: 1066px; }
           .mobile-images { display: block;}
           .mobile-images img { width: 400px; }
+          .mobile-images-full-height img { height: 100%; }
           .image-button { position: absolute; left: 0; top: 0; width: 100%; height: 100%; cursor: pointer; border: none; z-index: 2; background-color: transparent; }
           h1, h2 { text-align: center; }
         </style>
@@ -55,9 +58,7 @@ export default async function generateHtmlFromImagePaths(
       <body>
         <div id="overlay">
           <div id="overlay-container">
-            <div style="width: 100%; display: flex; justify-content: flex-end; max-width: 90%">
-              <button type="button" onClick="document.getElementById('overlay').style.display = 'none'">X</button>
-            </div>
+            <button type="button" onClick="document.getElementById('overlay').style.display = 'none'">X</button>
             <h2></h2>
             <img src="" alt="" /> 
           </div>
@@ -146,11 +147,11 @@ export default async function generateHtmlFromImagePaths(
                 .map((file: string) => {
                   return `
                     <div class="image-container">
-                      <div style="position: relative;">
+                      <div class="image-container-two" style="position: relative;">
                         <button type="button" class="image-button" onClick="handleImageButtonClick(event)" value=${file}></button>
                         <img src="${file}" alt="${file}" />
+                        <div class="image-text">${file.replace(".png", "")}</div>
                       </div>
-                      <div class="image-text">${file.replace(".png", "")}</div>
                     </div>
                   `;
                 })
@@ -170,10 +171,14 @@ export default async function generateHtmlFromImagePaths(
             <div>
               ${images
                 .map((file: string) => {
+                  const { height } = extractDimensionsFromPath(file);
                   return `
                     <div class="image-container">
-                      <img src="${file}" alt="${file}" />
-                      <div class="image-text">${file.replace(".png", "")}</div>
+                      <div class="image-container-two" style="position: relative;">
+                        <button type="button" class="image-button" onClick="handleImageButtonClick(event)" value=${file}></button>
+                        <img src="${file}" alt="${file}" style="height: ${fullHeight ? "100%" : `${height}px`};" />
+                        <div class="image-text">${file.replace(".png", "")}</div>
+                      </div>
                     </div>
                   `;
                 })
@@ -196,8 +201,11 @@ export default async function generateHtmlFromImagePaths(
                   const { width, height } = extractDimensionsFromPath(file);
                   return `
                     <div class="image-container">
-                      <img src="${file}" alt="${file}" style="width: ${width}px; height: ${height}px;" />
-                      <div class="image-text">${file.replace(".png", "")}</div>
+                      <div class="image-container-two" style="position: relative; width: fit-content; margin-left: auto; margin-right: auto;">
+                        <button type="button" class="image-button" onClick="handleImageButtonClick(event)" value=${file}></button>
+                        <img src="${file}" alt="${file}" style="width: ${width}px; height: ${fullHeight ? "100%" : `${height}px`};" />
+                        <div class="image-text" style="width: ${width}px;">${file.replace(".png", "")}</div>
+                      </div>
                     </div>
                   `;
                 })

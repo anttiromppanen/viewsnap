@@ -26,7 +26,11 @@ async function initializeLoaders() {
   return { chromiumLoader, firefoxLoader, webkitLoader };
 }
 
-export async function viewportsToSnapshots(rootPath: string, url: string) {
+export async function viewportsToSnapshots(
+  rootPath: string,
+  url: string,
+  fullHeight: boolean,
+) {
   const desktopViewports = Object.values(DESKTOP_VIEWPORT_SIZES);
   const tabletViewports = Object.values(TABLET_VIEWPORT_SIZES);
   const mobileViewports = Object.values(MOBILE_VIEWPORT_SIZES);
@@ -50,6 +54,7 @@ export async function viewportsToSnapshots(rootPath: string, url: string) {
     url,
     chromiumBrowser,
     "chromium",
+    fullHeight,
   );
 
   chromiumLoader.success();
@@ -65,6 +70,7 @@ export async function viewportsToSnapshots(rootPath: string, url: string) {
     url,
     firefoxBrowser,
     "firefox",
+    fullHeight,
   );
 
   firefoxLoader.success();
@@ -80,6 +86,7 @@ export async function viewportsToSnapshots(rootPath: string, url: string) {
     url,
     webkitBrowser,
     "webkit",
+    fullHeight,
   );
 
   webkitLoader.success();

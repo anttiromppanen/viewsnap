@@ -10,6 +10,7 @@ export async function createSnapshotForBrowser(
   category: "desktop" | "mobile" | "tablet",
   browser: Browser,
   browserType: BrowserType,
+  fullHeight: boolean,
 ) {
   // 2 * 60 * 1000 milliseconds = 2 minutes
   const timeout = 2 * 60 * 1000;
@@ -23,6 +24,7 @@ export async function createSnapshotForBrowser(
     path: `${rootPath}/.viewsnap/img/${browserType}/${category}/${browserType}-${width}-${height}.png`,
     timeout: timeout,
     animations: "disabled",
+    fullPage: fullHeight,
   });
 }
 
@@ -34,6 +36,7 @@ export async function createAllViewportSnapshotsForBrowser(
   url: string,
   browser: Browser,
   browserType: BrowserType,
+  fullHeight: boolean,
 ) {
   const promises = [];
 
@@ -46,6 +49,7 @@ export async function createAllViewportSnapshotsForBrowser(
         "desktop",
         browser,
         browserType,
+        fullHeight,
       ),
     );
   }
@@ -59,6 +63,7 @@ export async function createAllViewportSnapshotsForBrowser(
         "tablet",
         browser,
         browserType,
+        fullHeight,
       ),
     );
   }
@@ -72,6 +77,7 @@ export async function createAllViewportSnapshotsForBrowser(
         "mobile",
         browser,
         browserType,
+        fullHeight,
       ),
     );
   }

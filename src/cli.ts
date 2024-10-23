@@ -1,26 +1,21 @@
 #!/bin/env node
+
+import { Command } from "commander";
 import path from "path";
+import generateCommand from "./commands/generate.command";
+import generateHtmlPage from "./service/generateHtmlPage";
 import { viewportsToSnapshots } from "./service/viewportsToSnapshots";
-import generateHtmlFromImagePaths from "./service/createHtml";
 
-async function generateHtmlPage() {
-  const pageTitle = "Viewport Snapshots";
-
-  const rootPath = path.resolve(process.cwd());
-  const imagesPath = path.resolve(rootPath, ".viewsnap/img/");
-  const outputHtmlPath = path.join(`${rootPath}/.viewsnap`, "snapshots.html");
-
-  // Call the function to generate the HTML page
-  generateHtmlFromImagePaths(imagesPath, outputHtmlPath, pageTitle);
-}
+const program = new Command();
 
 async function run() {
-  const rootPath = path.resolve(process.cwd()) as string;
-  console.time("Time taken to generate snapshots");
-  await viewportsToSnapshots(rootPath, "http://localhost:8080");
-  console.timeEnd("Time taken to generate snapshots");
+  program
+    .name("viewsnap")
+    .description("Generate snapshots of various viewport sizes for a given URL")
+    .version("1.0.0");
 
-  await generateHtmlPage();
+  program.addCommand(generateCommand);
+  program.parse();
 }
 
 run();
