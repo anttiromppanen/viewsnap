@@ -8,11 +8,30 @@ A Node.js CLI tool that captures responsive snapshots of a website, generating i
 
 ## Usage
 
+**Option 1:** Use directly with npx
+```javascript
+npx viewsnap generate <url>
+```
+
+**Option 2:**
+Install viewsnap package globally
+```javascript
+npm install -g viewsnap
+```
+```javascript
+viewsnap generate <url>
+```
+
+**Option 3:** install to project scope, and add the command to PATH variable
 ```javascript
 npm install viewsnap --save-dev
 ```
+Add the viewsnap command to PATH variable:
 ```javascript
-npx viewsnap
+export PATH=$PATH:$(npm bin -g)
+```
+```javascript
+viewsnap generate <url>
 ```
 
 *Snapshots* and an overview page *snapshots.html* are stored in .viewsnap directory.
