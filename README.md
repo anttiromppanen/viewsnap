@@ -4,6 +4,8 @@
 
 A Node.js CLI tool that captures responsive snapshots of a website, generating images for multiple viewport sizes. This allows developers to quickly test and visualize how their web pages appear across different devices and browsers, from mobile to desktop, streamlining the process of ensuring a responsive design.
 
+> **_NOTE:_** Animations on a website may produce various different results on the images.
+
 ## Usage
 
 ```javascript
