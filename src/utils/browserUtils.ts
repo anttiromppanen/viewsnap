@@ -15,17 +15,24 @@ export async function createSnapshotForBrowser(
   // 2 * 60 * 1000 milliseconds = 2 minutes
   const timeout = 2 * 60 * 1000;
   const page = await browser.newPage();
-  await page.setViewportSize(viewportSize);
+  try {
+    await page.setViewportSize(viewportSize);
 
-  const { width, height } = viewportSize;
+    const { width, height } = viewportSize;
 
-  await page.goto(url, { timeout: timeout });
-  await page.screenshot({
-    path: `${rootPath}/.viewsnap/img/${browserType}/${category}/${browserType}-${width}-${height}.png`,
-    timeout: timeout,
-    animations: "disabled",
-    fullPage: fullHeight,
-  });
+    await page.goto(url, { timeout: timeout });
+    await page.screenshot({
+      path: `${rootPath}/.viewsnap/img/${browserType}/${category}/${browserType}-${width}-${height}.png`,
+      timeout: timeout,
+      animations: "disabled",
+      fullPage: fullHeight,
+    });
+  } catch (error) {
+    console.error(
+      `Error generating snapshot for ${browserType}/${category}/${viewportSize}: ${error}`,
+    );
+    process.exit(1);
+  }
 }
 
 export async function createAllViewportSnapshotsForBrowser(
@@ -82,5 +89,10 @@ export async function createAllViewportSnapshotsForBrowser(
     );
   }
 
-  await Promise.all(promises);
+  try {
+    await Promise.all(promises);
+  } catch (error) {
+    console.error(`Error generating snapshots for ${browserType}: ${error}`);
+    process.exit(1);
+  }
 }

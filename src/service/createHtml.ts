@@ -28,10 +28,10 @@ export default async function generateHtmlFromImagePaths(
         <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&family=Outfit:wght@100..900&display=swap" rel="stylesheet">
         <title>${title}</title>
         <style>
-          body { font-family: "Montserrat", sans-serif; padding: 0 30px; background-color: #fdfdfd; color: #243642; }
+          body { font-family: "Montserrat", sans-serif; background-color: #fdfdfd; color: #243642; }
           img { border-radius: 10px; box-shadow: 0 0 12px 0 rgba(0, 0, 0, 0.2); }
           h1 { font-size: 2.5rem; }
-          .container { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 40px; }
+          .container { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 40px; overflow-x: scroll; padding: 0 30px; }
           .container img { height: 500px; width: 100%; }
           #overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100vh; max-height: 100vh; background-color: rgba(0, 0, 0, 0.8); z-index: 9999; display: none; justify-content: center; align-items: center; color: white; font-size: 24px; }
           #overlay-container { display: flex; flex-direction: column; justify-content: center; align-items: center; height: 100%; }
@@ -255,7 +255,7 @@ export default async function generateHtmlFromImagePaths(
     const htmlContent = generateHTML(images);
 
     await fs.promises.writeFile(outputHtmlFilepath, htmlContent);
-    console.log(`HTML file has been generated at: ${outputHtmlFilepath}`);
+    console.log(`HTML file has been generated at: ${outputHtmlFilepath}\n`);
   } catch (err) {
     console.error("Error generating snapshots page:", err);
   }

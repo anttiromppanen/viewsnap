@@ -44,6 +44,7 @@ export async function viewportsToSnapshots(
     await initializeLoaders();
 
   console.log("\nGenerating snapshots for all viewports...\n");
+  fullHeight && console.log("- Full height screenshots option enabled\n");
   chromiumLoader.start();
 
   await createAllViewportSnapshotsForBrowser(
