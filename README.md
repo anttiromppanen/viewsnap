@@ -1,6 +1,6 @@
 # Viewsnap
 
-![Viewsnap logo](public/logo.png)
+![Viewsnap logo](https://github.com/anttiromppanen/viewsnap/blob/main/public/logo.png)
 
 A Node.js CLI tool that captures responsive snapshots of a website, generating images for multiple viewport sizes. This allows developers to quickly test and visualize how their web pages appear across different devices and browsers, from mobile to desktop, streamlining the process of ensuring a responsive design.
 
@@ -39,9 +39,12 @@ viewsnap generate <url> [options]
 npm viewsnap generate http://localhost:5137
 ```
 
-![snapshots.html preview](public/generate1.png)
-<br>snapshots.html:<br>
-![snapshots.html preview](public/generate2.png)
+![snapshots.html preview](https://github.com/anttiromppanen/viewsnap/blob/main/public/generate1.png)
+
+*snapshots.html:*
+
+
+![snapshots.html preview](https://github.com/anttiromppanen/viewsnap/blob/main/public/generate2.png)
 
 ## Contributing
 All contributions are welcome, please read [how to contribute](CONTRIBUTING.md) first.
