@@ -14,11 +14,11 @@ export async function createSnapshotForBrowser(
 ) {
   // 2 * 60 * 1000 milliseconds = 2 minutes
   const timeout = 2 * 60 * 1000;
-  const page = await browser.newPage();
-  try {
-    await page.setViewportSize(viewportSize);
+  const { width, height } = viewportSize;
 
-    const { width, height } = viewportSize;
+  try {
+    const page = await browser.newPage();
+    await page.setViewportSize(viewportSize);
 
     await page.goto(url, { timeout: timeout });
     await page.screenshot({
@@ -29,7 +29,7 @@ export async function createSnapshotForBrowser(
     });
   } catch (error) {
     console.error(
-      `Error generating snapshot for ${browserType}/${category}/${viewportSize}: ${error}`,
+      `\n\nError generating snapshot for ${browserType}/${category}/${width}-${height}: ${error}`,
     );
     process.exit(1);
   }
