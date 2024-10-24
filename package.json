@@ -41,6 +41,7 @@
   },
   "dependencies": {
     "commander": "^12.1.0",
+    "open": "^10.1.0",
     "playwright-chromium": "^1.48.1",
     "playwright-firefox": "^1.48.1",
     "playwright-webkit": "^1.48.1",
