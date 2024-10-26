@@ -1,6 +1,6 @@
 {
   "name": "viewsnap",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Creates a collection of snapshots of a webpage for various viewport dimensions",
   "main": "cli.js",
   "bin": {
