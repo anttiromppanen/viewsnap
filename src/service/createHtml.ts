@@ -39,12 +39,15 @@ export default async function generateHtmlFromImagePaths(
           #overlay-container h2 { position: absolute; top: 15px; left: 20px; font-size: 1.3rem; }
           #overlay img { max-width: 90%; max-height: 90%; }
           #device-group-select { padding: 10px; font-size: 1.2rem; border-radius: 5px; border: 1px solid #243642; }
+          #active-viewports-heading { font-size: 1.5rem; }
           .input-container { display: flex; gap: 0 10px; margin-bottom: 20px; justify-content: center; }
           .image-wrapper { display: flex; flex-direction: column; }
           .image-container { position: relative; text-align: center; border-radius: 10px; margin-bottom: 80px; }
-          .image-text { background-color: red; height: calc(100% - 3px); position: absolute; left: 0; bottom: 3px; width: 100%; color: white; display: flex; justify-content: center; align-items: center; border-radius: 10px; visibility: hidden; background-color: rgba(0, 0, 0, 0.7); }
+          .image-text { background-color: red; height: calc(100% - 3px); position: absolute; left: 0; bottom: 3px; width: 100%; color: white; display: flex; justify-content: center; align-items: center; border-radius: 10px; visibility: hidden; background-color: rgba(0, 0, 0, 0.2); }
+          .image-text p { background-color: rgba(0, 0, 0, 0.5); padding: 5px 10px; border-radius: 5px; margin-left: 10px; margin-right: 10px; }
           .image-container-two:hover .image-text { visibility: visible; }
           .browser-text { text-align: center; font-size: 1.2rem; margin-bottom: 30px; color: #387478; }
+          .viewport-text { margin-bottom: 40px; margin-top: 40px; font-size: 2rem; }
           .desktop-images { display: block; }
           .tablet-images { display: block;}
           .tablet-images img { height: 1066px; }
@@ -139,8 +142,10 @@ export default async function generateHtmlFromImagePaths(
     const desktopImagesHtml = `
     ${Object.entries(imageFiles.desktop)
       .map(([browser, images]) => {
+        const browserIsFirefox = browser === "firefox";
         return `
           <article class="image-wrapper desktop-images">
+            <h2 class="viewport-text" style="${`visibility: ${browserIsFirefox ? "visible" : "hidden"};`}">Desktop</h2>
             <h3 class="browser-text">${browser}</h3>
             <div>
               ${images
@@ -150,7 +155,9 @@ export default async function generateHtmlFromImagePaths(
                       <div class="image-container-two" style="position: relative;">
                         <button type="button" class="image-button" onClick="handleImageButtonClick(event)" value=${file}></button>
                         <img src="${file}" alt="${file}" />
-                        <div class="image-text">${file.replace(".png", "")}</div>
+                        <div class="image-text">
+                          <p>${file.replace(".png", "")}</p>
+                        </div>
                       </div>
                     </div>
                   `;
@@ -165,8 +172,10 @@ export default async function generateHtmlFromImagePaths(
     // Tablet images HTML
     const tabletImagesHtml = Object.entries(imageFiles.tablet)
       .map(([browser, images]) => {
+        const browserIsFirefox = browser === "firefox";
         return `
           <article class="image-wrapper tablet-images">
+            <h2 class="viewport-text" style="${`visibility: ${browserIsFirefox ? "visible" : "hidden"};`}">Tablet</h2>
             <h3 class="browser-text">${browser}</h3>
             <div>
               ${images
@@ -177,7 +186,9 @@ export default async function generateHtmlFromImagePaths(
                       <div class="image-container-two" style="position: relative;">
                         <button type="button" class="image-button" onClick="handleImageButtonClick(event)" value=${file}></button>
                         <img src="${file}" alt="${file}" style="${fullHeight && `height: ${height}`}" />
-                        <div class="image-text">${file.replace(".png", "")}</div>
+                        <div class="image-text">
+                          <p>${file.replace(".png", "")}</p>
+                        </div>
                       </div>
                     </div>
                   `;
@@ -192,8 +203,10 @@ export default async function generateHtmlFromImagePaths(
     // Mobile images HTML
     const mobileImagesHtml = Object.entries(imageFiles.mobile)
       .map(([browser, images]) => {
+        const browserIsFirefox = browser === "firefox";
         return `
           <article class="image-wrapper mobile-images">
+            <h2 class="viewport-text" style="${`visibility: ${browserIsFirefox ? "visible" : "hidden"};`}">Mobile</h2>
             <h3 class="browser-text">${browser}</h3>
             <div>
               ${images
@@ -204,7 +217,9 @@ export default async function generateHtmlFromImagePaths(
                       <div class="image-container-two" style="position: relative; width: fit-content; margin-left: auto; margin-right: auto;">
                         <button type="button" class="image-button" onClick="handleImageButtonClick(event)" value=${file}></button>
                         <img src="${file}" alt="${file}" style="width: ${width}px; height: ${fullHeight ? "100%" : `${height}px`};" />
-                        <div class="image-text" style="width: ${width}px;">${file.replace(".png", "")}</div>
+                        <div class="image-text" style="width: ${width}px;">
+                          <p>${file.replace(".png", "")}</p>
+                        </div>
                       </div>
                     </div>
                   `;

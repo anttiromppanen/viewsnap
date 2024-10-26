@@ -1,6 +1,6 @@
 {
   "name": "viewsnap",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Creates a collection of snapshots of a webpage for various viewport dimensions",
   "main": "cli.js",
   "bin": {
@@ -33,6 +33,10 @@
   ],
   "author": "Antti Romppanen",
   "license": "MIT",
+  "homepage": "https://github.com/anttiromppanen/viewsnap/",
+  "bugs": {
+    "url": "https://github.com/anttiromppanen/viewsnap/issues"
+  },
   "devDependencies": {
     "@types/node": "^22.7.6",
     "eslint": "^9.12.0",
